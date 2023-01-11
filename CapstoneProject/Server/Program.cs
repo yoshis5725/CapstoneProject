@@ -1,5 +1,7 @@
 ﻿global using Microsoft.EntityFrameworkCore;
+global using CapstoneProject.Shared.Models;
 using CapstoneProject.Server.Data;
+using CapstoneProject.Server.Services.ProductServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,10 @@ builder.Services.AddDbContext<MyDbContext>(options =>
 {
     if (connectionString != null) options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
+
+
+// *** DEPENDENCY INJECTIONS ***
+builder.Services.AddScoped<IProductService, ProductService>();
 
 
 // *** SWAGGER MIDDLEWARE ***
@@ -38,8 +44,8 @@ else
 
 
 // *** SWAGGER MIDDLEWARE ***
-app.UseSwaggerUI();
 app.UseSwagger();
+app.UseSwaggerUI();
 
 
 app.UseHttpsRedirection();
