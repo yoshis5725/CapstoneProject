@@ -7,4 +7,5 @@ public interface IProductService
     public List<Product> Products { get; set; }
     Task<ServiceResponse<List<Product>>> GetAllProducts();
     Task<ServiceResponse<Product>> GetSingleProduct(int productId);
+    Task<ServiceResponse<List<Product>>> GetProductByCategory(string categoryUrl);
 }

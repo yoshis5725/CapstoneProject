@@ -1,5 +1,7 @@
 ﻿global using Microsoft.EntityFrameworkCore;
 global using CapstoneProject.Shared.Models;
+global using CapstoneProject.Shared.ServiceResponse;
+global using CapstoneProject.Server.Services.CategoryServices;
 using CapstoneProject.Server.Data;
 using CapstoneProject.Server.Services.ProductServices;
 
@@ -16,6 +18,7 @@ builder.Services.AddDbContext<MyDbContext>(options =>
 
 // *** DEPENDENCY INJECTIONS ***
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 
 // *** SWAGGER MIDDLEWARE ***

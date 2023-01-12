@@ -1,4 +1,5 @@
 @inject IProductService ProductService
+@implements IDisposable;
 
 
 @if (ProductService.Products == null)
@@ -33,14 +34,18 @@ else
 
 
 @code {
-    // *** FIELDS ***
-    private static List<Product> _products = new();
+    
+    // *** Re-rendering the component when the product is called in the Index.razor page. This render will occur when
+    // the productsList needs to be filtered by a categoryUrl
+    protected override void OnInitialized()
+    {
+        ProductService.ChangeOnComponent += StateHasChanged;
+    }
 
     
-    // *** ON INIT ***
-    protected override async Task OnInitializedAsync()
+    public void Dispose()
     {
-        await ProductService.GetAllProducts();
+        ProductService.ChangeOnComponent -= StateHasChanged;
     }
 
 }

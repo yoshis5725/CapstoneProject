@@ -1,6 +1,7 @@
 using CapstoneProject.Server.Services.ProductServices;
 using CapstoneProject.Shared.ServiceResponse;
 using Microsoft.AspNetCore.Mvc;
+using ProductService = CapstoneProject.Client.Services.ProductServices.ProductService;
 
 namespace CapstoneProject.Server.Controllers;
 
@@ -38,5 +39,13 @@ public class ProductController : Controller
     {
         var product = await _productService.GetSingleProduct(productId);
         return Ok(product);
+    }
+
+
+    [HttpGet("category/{categoryUrl}")]
+    public async Task<ActionResult<ServiceResponse<List<Product>>>> GetProductByCategory(string categoryUrl)
+    {
+        var products = await _productService.GetProductByCategory(categoryUrl);
+        return Ok(products);
     }
 }
