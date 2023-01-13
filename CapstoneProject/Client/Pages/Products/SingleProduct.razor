@@ -15,8 +15,32 @@ else
         <div class="media-body">
             <h2 class="mb-0">@_product.Title</h2>
             <p>@_product.Description</p>
+            
+            @* only showing the select box if the variant count is greater than 1 *@
+            @if (_product.ProductVariants?.Count != null && _product.ProductVariants.Count > 1)
+            {
+                <div class="mb-3">
+                    <select class="form-select" @bind="_currentTypeId">
+                        @foreach (var variant in _product.ProductVariants)
+                        {
+                            <option value="@variant.ProductTypeId">@variant.ProductType?.Name</option>
+                        }
+                    </select>
+                </div>
+            }
+            
+            @* Displaying the original price if it is not null *@
+            @if (GetSelectedVariant() != null)
+            {
+                @if (GetSelectedVariant().OriginalPrice > GetSelectedVariant().Price)
+                {
+                    <h6 class="text-muted original-price">$@GetSelectedVariant().OriginalPrice</h6>
+                }
+            }
+            
+            @* Displaying the discounted price *@
             <h4 class="price">
-                @* $@_product.Price *@
+                $@GetSelectedVariant().Price
             </h4>
         </div>
     </div>
@@ -27,8 +51,11 @@ else
     [Parameter] public int Id { get; set; }
     private Product? _product;
     private string _message = string.Empty;
+    private int _currentTypeId = 1;
 
 
+
+    // *** Getting the product details via the result of the GetSingleProduct() method.
     protected override async Task OnParametersSetAsync()
     {
         _message = "Loading the requested product details...";
@@ -42,6 +69,17 @@ else
         else
         {
             _product = serviceResponse.Data;
+
+            if (_product?.ProductVariants.Count > 0)
+            {
+                _currentTypeId = _product.ProductVariants[0].ProductTypeId;
+            }
         }
+    }
+    
+    private ProductVariant? GetSelectedVariant()
+    {
+        var variant = _product?.ProductVariants.FirstOrDefault(p => p.ProductTypeId == _currentTypeId);
+        return variant;
     }
 }

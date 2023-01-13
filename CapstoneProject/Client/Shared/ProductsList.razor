@@ -4,7 +4,7 @@
 
 @if (ProductService.Products == null)
 {
-    <h2>Loading the list of products...</h2>
+    <h2>@ProductService.Message</h2>
     <br />
 }
 else
@@ -24,7 +24,7 @@ else
                     </a>
                     <p>@product.Description</p>
                     <h5 class="price">
-                        @* $@product.Price *@
+                        @GetPricing(product)
                     </h5>
                 </div>
             </li>
@@ -48,4 +48,21 @@ else
         ProductService.ChangeOnComponent -= StateHasChanged;
     }
 
+
+    private string GetPricing(Product product)
+    {
+        var variant = product.ProductVariants;
+        var minPrice = variant.Min(p => p.Price);
+
+        
+        switch (variant.Count)
+        {
+            case 0:
+                return string.Empty;
+            case 1:
+                return $"${variant[0].Price}";
+            default:
+                return $"Starting at ${minPrice}";
+        }
+    }
 }

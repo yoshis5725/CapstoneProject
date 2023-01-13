@@ -6,6 +6,7 @@ public class Product
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;
+    public List<ProductVariant> ProductVariants { get; set; } = new();
     
     
     // *** Category FK ***

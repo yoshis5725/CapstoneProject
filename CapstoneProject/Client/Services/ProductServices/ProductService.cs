@@ -7,6 +7,7 @@ public class ProductService : IProductService
     // *** FIELDS ***
     private readonly HttpClient _httpClient;
     public event Action? ChangeOnComponent;
+    public string Message { get; set; }
     public List<Product>? Products { get; set; }
     
     
@@ -45,5 +46,26 @@ public class ProductService : IProductService
     {
         var response = await _httpClient.GetFromJsonAsync<ServiceResponse<Product>>($"api/Product/{productId}");
         return response;
+    }
+
+    
+    public async Task SearchProducts(string searchText)
+    {
+        var response = await _httpClient.GetFromJsonAsync<ServiceResponse<List<Product>>>($"api/Product/search/{searchText}");
+        
+        if (response is { Data: { } })
+            Products = response?.Data;
+
+        if (Products?.Count < 1)
+            Message = $"No products found!";
+        
+        ChangeOnComponent?.Invoke();
+    }
+
+    
+    public async Task<List<string>?> SearchProductSuggestions(string searchText)
+    {
+        var response = await _httpClient.GetFromJsonAsync<ServiceResponse<List<string>>>($"api/Product/search/suggestions/{searchText}");
+        return response?.Data;
     }
 }
