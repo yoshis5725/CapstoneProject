@@ -118,7 +118,7 @@ public class ProductService : IProductService
         return await _myDbContext.Products
             .Where(p => p.Title.ToLower()
                 .Contains(searchText) || p.Description.ToLower().Contains(searchText))
-            .Include(p => p.ProductVariants )
+            .Include(p => p.ProductVariants)
             .ToListAsync();
     }
 }

@@ -18,7 +18,8 @@
     public string? SearchText { get; set; } = null;
 
     
-    // *** ON INIT ***
+    // *** Depending on the if an argument is passed into the a method; on initialization, the index will either show
+    // user searched products, category specific products, or it all products
     protected override async Task OnParametersSetAsync()
     {
         if (SearchText != null)
