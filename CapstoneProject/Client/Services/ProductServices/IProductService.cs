@@ -7,6 +7,14 @@ public interface IProductService
     public List<Product>? Products { get; set; }
     Task GetAllProducts(string? categoryUrl = null);
     Task<ServiceResponse<Product>?> GetSingleProduct(int productId);
-    Task SearchProducts(string searchText);
+    Task SearchProducts(string searchText, int page);
     Task<List<string>?> SearchProductSuggestions(string searchText);
+    
+    
+    //*** PAGINATION ***
+    public int CurrentPage { get; set; }
+    public int PageCount { get; set; }
+    public string LastSearchText { get; set; }
+    
+
 }

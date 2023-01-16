@@ -11,6 +11,13 @@ public class ProductService : IProductService
     public List<Product>? Products { get; set; }
     
     
+    // *** Pagination Fields ***
+    public int CurrentPage { get; set; } = 1;
+    public int PageCount { get; set; } = 0;
+    public string LastSearchText { get; set; } = string.Empty;
+    
+    
+    
     // *** Constructor - httpclient injection ***
     public ProductService(HttpClient httpClient)
     {
@@ -38,6 +45,13 @@ public class ProductService : IProductService
                 Products = response.Data;
         }
         
+        // *** PAGINATION ***
+        CurrentPage = 1;
+        PageCount = 0;
+
+        if (PageCount == 0)
+            Message = "No products found!";
+        
         ChangeOnComponent?.Invoke();
     }
     
@@ -49,13 +63,18 @@ public class ProductService : IProductService
     }
 
     
-    public async Task SearchProducts(string searchText)
+    public async Task SearchProducts(string searchText, int page)
     {
-        var response = await _httpClient.GetFromJsonAsync<ServiceResponse<List<Product>>>($"api/Product/search/{searchText}");
-        
-        if (response is { Data: { } })
-            Products = response?.Data;
+        LastSearchText = searchText;
+        var response = await _httpClient.GetFromJsonAsync<ServiceResponse<ProductSearchResultDTO>>($"api/Product/search/{searchText}/{page}");
 
+        if (response is { Data: { } })
+        {
+            Products = response?.Data.Products;
+            CurrentPage = response.Data.CurrentPage;
+            PageCount = response.Data.Pages;
+        }
+        
         if (Products?.Count < 1)
             Message = $"No products found!";
         

@@ -1,5 +1,5 @@
 ﻿@page "/"
-@page "/search/{searchText}"
+@page "/search/{searchText}/{page:int}"
 @page "/{categoryUrl}"
 @inject IProductService ProductService
 
@@ -22,6 +22,9 @@ else
 
     [Parameter]
     public string? SearchText { get; set; } = null;
+    
+    [Parameter]
+    public int Page { get; set; } = 1;
 
     
     // *** Depending on the if an argument is passed into the a method; on initialization, the index will either show
@@ -30,7 +33,7 @@ else
     {
         if (SearchText != null)
         {
-            await ProductService.SearchProducts(SearchText);
+            await ProductService.SearchProducts(SearchText, Page);
         }
         else
         {

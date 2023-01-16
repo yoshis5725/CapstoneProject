@@ -50,10 +50,10 @@ public class ProductController : Controller
     }
 
 
-    [HttpGet("search/{searchText}")]
-    public async Task<ActionResult<ServiceResponse<List<Product>>>> GetProductsBySearch(string searchText)
+    [HttpGet("search/{searchText}/{page}")]
+    public async Task<ActionResult<ServiceResponse<ProductSearchResultDTO>>> GetProductsBySearch(string searchText, int page = 1)
     {
-        var searchProducts = await _productService.GetSearchProducts(searchText);
+        var searchProducts = await _productService.GetSearchProducts(searchText, page);
         return  Ok(searchProducts);
     }
     

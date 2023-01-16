@@ -20,6 +20,16 @@ public class ProductService : IProductService
     }
     
     
+    private async Task<List<Product>> RequestedSearchProducts(string searchText)
+    {
+        return await _myDbContext.Products
+            .Where(p => p.Title.ToLower()
+                .Contains(searchText) || p.Description.ToLower().Contains(searchText))
+            .Include(p => p.ProductVariants)
+            .ToListAsync();
+    }
+    
+    
     
     public async Task<ServiceResponse<List<Product>>> GetAllProducts()
     {
@@ -66,15 +76,36 @@ public class ProductService : IProductService
         return serviceResponse;
     }
 
-    public async Task<ServiceResponse<List<Product>>> GetSearchProducts(string searchText)
+    
+    public async Task<ServiceResponse<ProductSearchResultDTO>> GetSearchProducts(string searchText, int requestedPage)
     {
-        var serviceResponse = new ServiceResponse<List<Product>>
+        // number of results per page
+        const float pageResults = 2f;
+        
+        // page count with the results
+        var pageCount = Math.Ceiling((await RequestedSearchProducts(searchText)).Count / pageResults);
+
+        var products = await _myDbContext.Products
+            .Where(p => p.Title.ToLower()
+                .Contains(searchText) || p.Description.ToLower().Contains(searchText))
+            .Include(p => p.ProductVariants)
+            .Skip((requestedPage - 1) * (int)pageResults)
+            .Take((int)pageResults)
+            .ToListAsync();
+
+        var serviceResponse = new ServiceResponse<ProductSearchResultDTO>
         {
-            Data = await RequestedSearchProducts(searchText)
+            Data = new ProductSearchResultDTO
+            {
+                Products = products,
+                CurrentPage = requestedPage,
+                Pages = (int)pageCount
+            }
         };
 
         return serviceResponse;
     }
+    
 
     
     public async Task<ServiceResponse<List<string>>> GetProductsSearchSuggestions(string searchText)
@@ -126,12 +157,5 @@ public class ProductService : IProductService
     }
 
 
-    private async Task<List<Product>> RequestedSearchProducts(string searchText)
-    {
-        return await _myDbContext.Products
-            .Where(p => p.Title.ToLower()
-                .Contains(searchText) || p.Description.ToLower().Contains(searchText))
-            .Include(p => p.ProductVariants)
-            .ToListAsync();
-    }
+
 }
