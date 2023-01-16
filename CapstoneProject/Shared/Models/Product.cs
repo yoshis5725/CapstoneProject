@@ -7,6 +7,7 @@ public class Product
     public string Description { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;
     public List<ProductVariant> ProductVariants { get; set; } = new();
+    public bool Featured { get; set; } = false;
     
     
     // *** Category FK ***

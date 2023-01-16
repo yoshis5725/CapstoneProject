@@ -27,7 +27,7 @@ public class ProductService : IProductService
     {
         if (categoryUrl == null)
         {
-            var response = await _httpClient.GetFromJsonAsync<ServiceResponse<List<Product>>>("api/Product");
+            var response = await _httpClient.GetFromJsonAsync<ServiceResponse<List<Product>>>("api/Product/featured");
             if (response != null)
                 Products = response.Data;
         }

@@ -111,8 +111,21 @@ public class ProductService : IProductService
 
         return new ServiceResponse<List<string>> { Data = resultsList };
     }
+
     
-    
+    public async Task<ServiceResponse<List<Product>>> GetFeaturedProducts()
+    {
+        var serviceResponse = new ServiceResponse<List<Product>>
+        {
+            Data = await _myDbContext.Products.Where(p => p.Featured)
+                .Include(p => p.ProductVariants)
+                .ToListAsync()
+        };
+
+        return serviceResponse;
+    }
+
+
     private async Task<List<Product>> RequestedSearchProducts(string searchText)
     {
         return await _myDbContext.Products
