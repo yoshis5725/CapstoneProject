@@ -1,5 +1,7 @@
 @page "/product/{id:int}"
+@using CapstoneProject.Client.Services.CartItemServices
 @inject IProductService ProductService
+@inject ICartItemService CartItemService
 
 
 @if (_product == null)
@@ -35,13 +37,20 @@ else
                 @if (GetSelectedVariant().OriginalPrice > GetSelectedVariant().Price)
                 {
                     <h6 class="text-muted original-price">$@GetSelectedVariant().OriginalPrice</h6>
-                }
+                } 
+                
+                @* Displaying the discounted price *@
+                <h4 class="price">
+                    $@GetSelectedVariant().Price
+                </h4>
             }
             
-            @* Displaying the discounted price *@
-            <h4 class="price">
-                $@GetSelectedVariant().Price
-            </h4>
+            @* Add to cart button *@
+            <button class="btn btn-primary" @onclick="AddToCart">
+                <i class="oi oi-cart"></i> &nbsp; &nbsp; &nbsp; &nbsp; Add To Cart
+            </button>
+            
+
         </div>
     </div>
 }
@@ -77,9 +86,27 @@ else
         }
     }
     
+    
     private ProductVariant? GetSelectedVariant()
     {
         var variant = _product?.ProductVariants.FirstOrDefault(p => p.ProductTypeId == _currentTypeId);
         return variant;
+    }
+
+
+    private async Task AddToCart()
+    {
+        var productVariant = GetSelectedVariant();
+        
+        if (productVariant != null)
+        {
+            var cartItem = new CartItem
+            {
+                ProductId = productVariant.ProductId,
+                ProductTypeId = productVariant.ProductTypeId,
+            };
+            
+            await CartItemService.AddToCart(cartItem);
+        }
     }
 }
