@@ -1,0 +1,86 @@
+@page "/cart"
+@inject ICartItemService CartItemService
+
+
+<PageTitle>Shopping Cart</PageTitle>
+
+<h3>Shopping Cart</h3>
+
+@if (_cartProducts == null || _cartProducts.Count == 0)
+{
+    <span>@_message</span>
+}
+else
+{
+    <div>
+        @foreach (var product in _cartProducts)
+        {
+            <div class="container">
+                <div class="image-wrapper">
+                    <img src="@product.ImageUrl" alt="@product.Title" class="image" />
+                </div>
+                <div class="name">
+                    <h5><a href="/product/@product.ProductId">@product.Title</a></h5>
+                    <span>@product.ProductType</span><br />
+                    <input type="number" value="@product.Quantity"
+                   @onchange="@((ChangeEventArgs e) => UpdateQuantity(e, product))"
+                   class="form-control input-quantity"
+                   min="1" />
+                    <button class="btn-delete" @onclick="@(() =>
+                        RemoveProductFromCart(product.ProductId, product.ProductTypeId))">
+                        Delete
+                    </button>
+                </div>
+                <div class="cart-product-price">$@(product.Price * product.Quantity)</div>
+            </div>
+        }
+        <div class="cart-product-price">
+            Total (@_cartProducts.Count): $@_cartProducts.Sum(product => @product.Price * product.Quantity)
+        </div>
+    </div>
+}
+
+
+
+@code {
+    // *** FIELDS ***
+    private List<CartProductResponseDTO> _cartProducts = null;
+    private string _message = "Loading cart...";
+
+    
+    // *** Retrieving the cart items on initialization. If items do not exist in the cart, then return an empty cart 
+    // response, else returning the cart products
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCart();
+    }
+
+    
+    private async Task LoadCart()
+    {
+        if ((await CartItemService.GetAllCartItems()).Count == 0)
+        {
+            _message = "Currently, there are no products in your cart";
+            _cartProducts = new List<CartProductResponseDTO>();
+        }
+        else
+        {
+            _cartProducts = await CartItemService.GetCartProducts();
+        }
+    }
+
+
+    private async Task RemoveProductFromCart(int productId, int productTypeId)
+    {
+        await CartItemService.RemoveProductFromCart(productId, productTypeId);
+        await LoadCart();
+    }
+
+
+    private async Task UpdateQuantity(ChangeEventArgs e, CartProductResponseDTO product)
+    {
+        product.Quantity = int.Parse(e.Value.ToString());
+        if (product.Quantity == 0) product.Quantity = 1;
+        await CartItemService.UpdateQuantity(product);
+    }
+}
